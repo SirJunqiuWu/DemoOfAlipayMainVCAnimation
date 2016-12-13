@@ -1,0 +1,42 @@
+//
+//  CanClickImageView.m
+//  MovieDate
+//
+//  Created by 吴 吴 on 16/2/25.
+//  Copyright © 2016年 上海佳黛品牌策划有限公司. All rights reserved.
+//
+
+#import "CanClickImageView.h"
+#import "MDUrl.h"
+
+
+@implementation CanClickImageView
+
+- (id)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
+        self.userInteractionEnabled =YES;
+        UITapGestureRecognizer *tapGes = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapGesPressed)];
+        [self addGestureRecognizer:tapGes];
+    }
+    return self;
+}
+
+- (void)tapGesPressed {
+    [[SchemeHandler defaultHandler]handleUrl:self.clickUrl animated:YES];
+    if ([[MDFuctionManager sharedManager]isGotoAliBaiChuanWithUrl:self.clickUrl])
+    {
+        [[MDFuctionManager sharedManager]scanGoodWithArticleId:self.articleId CartoonId:self.movie_level2_id ItemUrl:self.clickUrl Callback:^(BOOL success, NSDictionary *dic, NSError *error) {
+            if (success) {
+                DLog(@"统计成功");
+                [[NSNotificationCenter defaultCenter]postNotificationName:AppTongJiScanSuccess object:nil];
+            }
+        }];
+    }
+}
+
+- (void)setImageUrl:(NSString *)imageUrl {
+    [self sd_setImageWithURL:[NSURL URLWithString:imageUrl] placeholderImage:nil];
+}
+
+@end

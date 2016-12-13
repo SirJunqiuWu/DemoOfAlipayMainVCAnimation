@@ -1,0 +1,824 @@
+//
+//  CoreUtil.m
+//  FashionMovie
+//
+//  Created by 吴 吴 on 15/8/26.
+//  Copyright (c) 2015年 蔡成汉. All rights reserved.
+//
+
+#import "CoreUtil.h"
+#import "MBProgressHUD.h"
+#import "MyBarButtonItem.h"
+#import "AppDelegate.h"
+#import <AVFoundation/AVFoundation.h>
+#import "HomeDataManager.h"
+
+@implementation CoreUtil
+
+#pragma mark - 视图模块
+
++ (UIView *)createTitleViewWithString:(NSString *)title AndTitleColor:(UIColor *)color Font:(float)font {
+    UIView* titleView =[[UIView alloc]init];
+    if (_IPHONE6 || _IPHONE6p)
+    {
+        titleView.frame = AppFrame(0,0,230,25);
+    }
+    else if (_IPHONE5_5c_5s || _IPHONE4_4s)
+    {
+        titleView.frame = AppFrame(0,0,185,25);
+    }
+    titleView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
+    
+    UILabel* titleLabel =[[UILabel alloc]initWithFrame:titleView.frame];
+    titleLabel.text = title;
+    titleLabel.textColor = color;
+    titleLabel.font = [UIFont boldSystemFontOfSize:font];
+    titleLabel.textAlignment = NSTextAlignmentCenter;
+    [titleView addSubview:titleLabel];
+    return titleView;
+}
+
++ (UIBarButtonItem *)createBarButtonItemWithTitle:(NSString *)title Target:(id)target Selector:(SEL)selector {
+    UIBarButtonItem *item = [[UIBarButtonItem alloc]initWithTitle:title style:UIBarButtonItemStylePlain target:target action:selector];
+    item.tintColor = [UIColor blackColor];
+    return item;
+}
+
++ (UIBarButtonItem *)creatNavigationBarBackItemWithTarget:(id)target Action:(SEL)selector {
+    UIView *backView  = [[UIView alloc]init];
+    backView.userInteractionEnabled = YES;
+    backView.frame = AppFrame(0, 0,50, 44);
+    
+    UIImageView *backImage = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"icon_back"]];
+    backImage.frame = AppFrame(0,(44-20)/2,20,20);
+    backImage.userInteractionEnabled = YES;
+    [backView addSubview:backImage];
+    
+    UIButton *backbtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    backbtn.frame = backView.frame;
+    [backbtn addTarget:target action:selector forControlEvents:UIControlEventTouchUpInside];
+    [backView addSubview:backbtn];
+    
+    UIBarButtonItem *backItem = [[UIBarButtonItem alloc]initWithCustomView:backView];
+    return backItem;
+}
+
++ (UIBarButtonItem *)creatNavigationBarWithTitle:(NSString *)title Target:(id)target Action:(SEL)selector IsLeft:(BOOL)isLeft {
+    UIView *backView  = [[UIView alloc]init];
+    backView.userInteractionEnabled = YES;
+    backView.frame = AppFrame(0, 0,50, 44);
+    
+    UILabel* titleLabel =[[UILabel alloc]initWithFrame:AppFrame(0,(44-18)/2,18, 18)];
+    if (isLeft)
+    {
+        titleLabel.frame = AppFrame(0,(44-18)/2,50, 18);
+    }
+    else
+    {
+        titleLabel.frame = AppFrame(0,(44-18)/2,50, 18);
+        titleLabel.textAlignment = NSTextAlignmentRight;
+    }
+    titleLabel.userInteractionEnabled = YES;
+    titleLabel.text = title;
+    titleLabel.textColor = [UIColor blackColor];
+    titleLabel.font = FONT18;
+    [backView addSubview:titleLabel];
+    
+    UIButton *backbtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    backbtn.frame = backView.frame;
+    [backbtn addTarget:target action:selector forControlEvents:UIControlEventTouchUpInside];
+    [backView addSubview:backbtn];
+    
+    UIBarButtonItem *backItem = [[UIBarButtonItem alloc]initWithCustomView:backView];
+    return backItem;
+}
+
+/**
+ *  创建导航按钮
+ *
+ *  @param target 目标对象
+ *  @param action 动作
+ *  @param icon   icon
+ *  @param isLeft 是否为左边，默认为NO
+ *
+ *  @return UIBarButtonItem
+ */
++(UIBarButtonItem *)createnavigationBarButtonItemWithTarget:(id)target action:(SEL)action icon:(UIImage *)icon isLeft:(BOOL)isLeft;
+{
+    UIView *tpView  = [[UIView alloc]init];
+    tpView.userInteractionEnabled = YES;
+    tpView.frame = AppFrame(0, 0,50, 44);
+    
+    UIImageView *backImage = [[UIImageView alloc]initWithImage:icon];
+    if (isLeft)
+    {
+        backImage.frame = AppFrame(0,(44-19)/2, 19, 19);
+    }
+    else
+    {
+        backImage.frame = AppFrame(30,(44-19)/2, 19, 19);
+    }
+    backImage.userInteractionEnabled = YES;
+    [tpView addSubview:backImage];
+    
+    UIButton *backbtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    backbtn.frame = tpView.frame;
+    [backbtn addTarget:target action:action forControlEvents:UIControlEventTouchUpInside];
+    [tpView addSubview:backbtn];
+    
+    UIBarButtonItem *backItem = [[UIBarButtonItem alloc]initWithCustomView:tpView];
+    return backItem;
+}
+
+/**
+ *  创建导航按钮
+ *
+ *  @param target 目标对象
+ *  @param action 动作
+ *  @param icon   icon
+ *  @param isLeft 是否为左边，默认为NO
+ *  @param size   尺寸
+ *
+ *  @return UIBarButtonItem
+ */
++(UIBarButtonItem *)createnavigationBarButtonItemWithTarget:(id)target action:(SEL)action icon:(UIImage *)icon isLeft:(BOOL)isLeft size:(CGSize)size
+{
+    UIView *tpView  = [[UIView alloc]init];
+    tpView.backgroundColor = [UIColor clearColor];
+    tpView.userInteractionEnabled = YES;
+    tpView.frame = AppFrame(0, 0,size.width, size.height);
+    
+    UIImageView *backImage = [[UIImageView alloc]initWithImage:icon];
+    if (isLeft)
+    {
+        backImage.frame = AppFrame(0,(size.height-20)/2,20,20);
+    }
+    else
+    {
+        backImage.frame = AppFrame(size.width-20,(size.height-20)/2,20,20);
+    }
+    backImage.userInteractionEnabled = YES;
+    [tpView addSubview:backImage];
+    
+    UIButton *backbtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    backbtn.frame = tpView.frame;
+    [backbtn addTarget:target action:action forControlEvents:UIControlEventTouchUpInside];
+    [tpView addSubview:backbtn];
+    
+    UIBarButtonItem *backItem = [[UIBarButtonItem alloc]initWithCustomView:tpView];
+    return backItem;
+}
+
++ (UIBarButtonItem *)creatNavigationCancelItemWithTarget:(id)target Selector:(SEL)selector IsLeft:(BOOL)isLeft {
+    UIView *backView  = [[UIView alloc]init];
+    backView.userInteractionEnabled = YES;
+    backView.frame = AppFrame(0, 0,50, 44);
+    
+    UIImageView *backImage = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"navRightCancel"]];
+    if (isLeft)
+    {
+        backImage.frame = AppFrame(0,(backView.height-15)/2, 15, 15);
+    }
+    else
+    {
+        backImage.frame = AppFrame(backView.width-15,10.5, 15,15);
+    }
+    backImage.userInteractionEnabled = YES;
+    [backView addSubview:backImage];
+    
+    UIButton *backbtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    backbtn.frame = backView.frame;
+    [backbtn addTarget:target action:selector forControlEvents:UIControlEventTouchUpInside];
+    [backView addSubview:backbtn];
+    
+    UIBarButtonItem *backItem = [[UIBarButtonItem alloc]initWithCustomView:backView];
+    return backItem;
+}
+
++ (UIBarButtonItem *)creatNavigationItemWithTarget:(id)target IconSize:(CGSize)iconSize Icon:(UIImage *)icon Selector:(SEL)selector IsLeft:(BOOL)isLeft {
+    UIView *backView  = [[UIView alloc]init];
+    backView.userInteractionEnabled = YES;
+    backView.frame = AppFrame(0, 0,50, 44);
+    
+    UIImageView *backImage = [[UIImageView alloc]initWithImage:icon];
+    if (isLeft)
+    {
+        backImage.frame = AppFrame(0,(backView.height-iconSize.height)/2,iconSize.width,iconSize.height);
+    }
+    else
+    {
+        backImage.frame = AppFrame(backView.width-iconSize.width,(backView.height-iconSize.height)/2, iconSize.width,iconSize.height);
+    }
+    backImage.userInteractionEnabled = YES;
+    [backView addSubview:backImage];
+    
+    UIButton *backbtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    backbtn.frame = backView.frame;
+    [backbtn addTarget:target action:selector forControlEvents:UIControlEventTouchUpInside];
+    [backView addSubview:backbtn];
+    
+    UIBarButtonItem *backItem = [[UIBarButtonItem alloc]initWithCustomView:backView];
+    return backItem;
+}
+
++ (UIBarButtonItem *)creatNavigationShareItemWithTarget:(id)target Selector:(SEL)selector {
+    UIView *backView  = [[UIView alloc]init];
+    backView.userInteractionEnabled = YES;
+    backView.frame = AppFrame(0, 0,50, 44);
+    
+    UIImageView *backImage = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"navRightShare"]];
+    backImage.frame = AppFrame(backView.width-15,(backView.height-15)/2,15,15);
+    backImage.userInteractionEnabled = YES;
+    [backView addSubview:backImage];
+    
+    UIButton *backbtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    backbtn.frame = backView.frame;
+    [backbtn addTarget:target action:selector forControlEvents:UIControlEventTouchUpInside];
+    [backView addSubview:backbtn];
+    
+    UIBarButtonItem *backItem = [[UIBarButtonItem alloc]initWithCustomView:backView];
+    return backItem;
+}
+
++ (UIBarButtonItem *)creatNavigationSearchItemWithTarget:(id)target Selector:(SEL)selector {
+    UIView *backView  = [[UIView alloc]init];
+    backView.userInteractionEnabled = YES;
+    backView.frame = AppFrame(0, 0,50, 44);
+    
+    UIImageView *backImage = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"da101_search"]];
+    backImage.frame = AppFrame(31,(44-19)/2,19,19);
+    backImage.userInteractionEnabled = YES;
+    [backView addSubview:backImage];
+    
+    UIButton *backbtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    backbtn.frame = backView.frame;
+    [backbtn addTarget:target action:selector forControlEvents:UIControlEventTouchUpInside];
+    [backView addSubview:backbtn];
+    
+    UIBarButtonItem *backItem = [[UIBarButtonItem alloc]initWithCustomView:backView];
+    return backItem;
+}
+
++ (UIBarButtonItem *)createNavigationBarBackItemWithTitle:(NSString *)title Target:(id)target Selector:(SEL)selector{
+    
+    CGFloat titleWidth = [CoreUtil getStringWidth:title AndFont:15];
+    
+    UIView *backView  = [[UIView alloc]init];
+    backView.frame = AppFrame(0, 0,14+titleWidth, 44);
+    
+    UIImageView *backImage = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"icon_back"]];
+    backImage.frame = AppFrame(0,12, 10, 20);
+    [backView addSubview:backImage];
+    
+    UILabel *backTitleLbl = [[UILabel alloc]init];
+    backTitleLbl.frame = AppFrame(14,(backView.height-20)/2, titleWidth, 20);
+    backTitleLbl.font = FONT15;
+    backTitleLbl.textColor = [UIColor whiteColor];
+    backTitleLbl.text = title;
+    [backView addSubview:backTitleLbl];
+    
+    UIButton *backbtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    backbtn.frame = backView.frame;
+    [backbtn addTarget:target action:selector forControlEvents:UIControlEventTouchUpInside];
+    [backView addSubview:backbtn];
+    
+    UIBarButtonItem *backItem = [[UIBarButtonItem alloc]initWithCustomView:backView];
+    return backItem;
+}
+
++ (UIToolbar *)createToolBar:(id)target RightAction:(SEL)okSelector LeftAction:(SEL)cancelSelector;{
+    
+    UIToolbar *bar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, klScreenWidth, 44)];
+    
+    UIButton *okbtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    okbtn.frame = AppFrame(0, 0, 44, 44);
+    [okbtn setTitle:@"确定" forState:UIControlStateNormal];
+    okbtn.titleLabel.font = [UIFont systemFontOfSize:16];
+    [okbtn setTitleColor:LightBlueColor forState:UIControlStateNormal];
+    [okbtn addTarget:target action:okSelector forControlEvents:UIControlEventTouchUpInside];
+    
+    UIButton *cancelbtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    cancelbtn.frame = AppFrame(0, 0, 44, 44);
+    [cancelbtn setTitle:@"取消" forState:UIControlStateNormal];
+    cancelbtn.titleLabel.font = [UIFont systemFontOfSize:16];
+    [cancelbtn setTitleColor:LightBlueColor forState:UIControlStateNormal];
+    [cancelbtn addTarget:target action:cancelSelector forControlEvents:UIControlEventTouchUpInside];
+    
+    
+    UIBarButtonItem *okBtn = [[UIBarButtonItem alloc]initWithCustomView:okbtn];
+    UIBarButtonItem *cancelBtn = [[UIBarButtonItem alloc]initWithCustomView:cancelbtn];
+    UIBarButtonItem *space = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:target action:nil];
+    NSArray *btarr = [NSArray arrayWithObjects:cancelBtn,space,okBtn,nil];
+    bar.items =btarr;
+    
+    /**
+     *  UIBarButtonItem 的字体颜色
+     */
+    bar.tintColor = [UIColor colorWithHexString:@"#00d7dc"];
+    
+    /**
+     *  间接改变toolBar的背景色
+     */
+    UIImage *img = [self getImageFromColor:[UIColor colorWithHexString:@"#e3e3e3"]];
+    [bar setBackgroundImage:img forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
+    
+    return bar;
+}
+
++ (UIImageView *)createBackGroundImageView:(NSString *)imageUrl Frame:(CGRect)frame {
+    UIImageView *imageView = [[UIImageView alloc]initWithFrame:frame];
+    imageView.backgroundColor = [UIColor clearColor];
+    imageView.userInteractionEnabled = YES;
+    if ([imageUrl isKindOfClass:[NSString class]]) {
+        imageView.image = [UIImage imageNamed:imageUrl];
+    }else if ([imageUrl hasPrefix:@"http"]){
+        [imageView sd_setImageWithURL:[NSURL URLWithString:imageUrl] placeholderImage:nil];
+    }
+    return imageView;
+}
+
++ (UIView *)setInputViewWithDatePicker:(UIDatePicker *)picker RightAction:(SEL)okSelector LeftAction:(SEL)cancelSelector Target:(id)target  {
+    
+    UIView *inputView = [[UIView alloc]init];
+    inputView.frame = AppFrame(0, 0, AppWidth, 260);
+    
+    UIButton *cancelBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 50, 44)];
+    [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
+    cancelBtn.titleLabel.font = [UIFont systemFontOfSize:20];
+    [cancelBtn setTitleColor:[UIColor colorWithHexString:@"#ffa300"] forState:UIControlStateNormal];
+    [cancelBtn addTarget:target action:cancelSelector forControlEvents:UIControlEventTouchUpInside];
+    [inputView addSubview:cancelBtn];
+    
+    UIButton *completeBtn = [[UIButton alloc] initWithFrame:CGRectMake(AppWidth-50, 0, 50, 44)];
+    [completeBtn setTitle:@"确定" forState:UIControlStateNormal];
+    completeBtn.titleLabel.font = [UIFont systemFontOfSize:20];
+    [completeBtn setTitleColor:[UIColor colorWithHexString:@"#ffa300"] forState:UIControlStateNormal];
+    [completeBtn addTarget:target action:okSelector forControlEvents:UIControlEventTouchUpInside];
+    [inputView addSubview:completeBtn];
+    
+    picker.frame = AppFrame(0, 44, AppWidth, 216);
+    [inputView addSubview:picker];
+    
+    return inputView;
+}
+
++ (UIView *)setInputViewWithPicker:(UIPickerView *)picker RightAction:(SEL)okSelector LeftAction:(SEL)cancelSelector Target:(id)target  {
+    
+    UIView *inputView = [[UIView alloc]init];
+    inputView.frame = AppFrame(0, 0, AppWidth, 260);
+    
+    UIButton *cancelBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 50, 44)];
+    [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
+    cancelBtn.titleLabel.font = [UIFont systemFontOfSize:20];
+    [cancelBtn setTitleColor:[UIColor colorWithHexString:@"#ffa300"] forState:UIControlStateNormal];
+    [cancelBtn addTarget:target action:cancelSelector forControlEvents:UIControlEventTouchUpInside];
+    [inputView addSubview:cancelBtn];
+    
+    UIButton *completeBtn = [[UIButton alloc] initWithFrame:CGRectMake(AppWidth-50, 0, 50, 44)];
+    [completeBtn setTitle:@"确定" forState:UIControlStateNormal];
+    completeBtn.titleLabel.font = [UIFont systemFontOfSize:20];
+    [completeBtn setTitleColor:[UIColor colorWithHexString:@"#ffa300"] forState:UIControlStateNormal];
+    [completeBtn addTarget:target action:okSelector forControlEvents:UIControlEventTouchUpInside];
+    [inputView addSubview:completeBtn];
+    
+    picker.frame = AppFrame(0, 44, AppWidth, 216);
+    [inputView addSubview:picker];
+    
+    return inputView;
+}
+
++ (UIActivityIndicatorView *)creatActivityIndicatorView {
+    UIActivityIndicatorView *activityIndicator = [[UIActivityIndicatorView alloc]initWithFrame:CGRectMake((klScreenWidth-20)/2,(klScreenHeight-30-64)/2,30.0f,30.0f)];
+    [activityIndicator setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleGray];
+    return activityIndicator;
+}
+
++ (UIView *)creatNoDataViewWithFrame:(CGRect)frame Target:(id)target Selector:(SEL)selector Text:(NSString *)text {
+    UIView *resultView = [[UIView alloc]initWithFrame:frame];
+    resultView.userInteractionEnabled = YES;
+    
+    UIImageView *noDataIcon = [[UIImageView alloc]initWithFrame:AppFrame((resultView.width-259/2)/2,0,259/2,38/2)];
+    noDataIcon.backgroundColor = [UIColor clearColor];
+    noDataIcon.image = [UIImage imageNamed:@"noDataIcon"];
+    [resultView addSubview:noDataIcon];
+    
+    UILabel *noRecordLbl = [[UILabel alloc] init];
+    noRecordLbl.frame = AppFrame(0,noDataIcon.bottom+10, resultView.width,16);
+    noRecordLbl.font = FONT16;
+    noRecordLbl.textColor = Color_949494;
+    noRecordLbl.text = text;
+    noRecordLbl.textAlignment = NSTextAlignmentCenter;
+    noRecordLbl.userInteractionEnabled = NO;
+    [resultView addSubview:noRecordLbl];
+    
+//    UIButton  *refreshBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+//    refreshBtn.frame = AppFrame(0, 0, resultView.width, resultView.height);
+//    [refreshBtn setTitle:@"点击刷新" forState:UIControlStateNormal];
+//    [refreshBtn setTitleColor:ColorFfdd3f forState:UIControlStateNormal];
+//    [refreshBtn addTarget:target action:selector forControlEvents:UIControlEventTouchUpInside];
+//    [resultView addSubview:refreshBtn];
+    
+    return resultView;
+}
+
+#pragma mark - 字符串模块
+
++ (float)getStringWidth:(NSString *)string AndFont:(float)font {
+   
+    float Ypos;
+    CGSize size = CGSizeMake(klScreenWidth,MAXFLOAT);
+    CGRect rect;
+    
+    rect=[string boundingRectWithSize:size
+                               options:NSStringDrawingUsesLineFragmentOrigin
+                            attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:font]}
+                               context:nil];
+    Ypos=rect.size.width;
+    return Ypos;
+}
+
++ (NSAttributedString *)getFormatStringWithSourceString:(NSString *)source KeyWordsOne:(NSString *)keyWordsOne Font:(UIFont *)font Color:(UIColor *)color {
+    NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc]initWithString:source];
+    NSRange rangOne = [source rangeOfString:keyWordsOne];
+    [attrString addAttribute:NSFontAttributeName value:font range:rangOne];
+    [attrString addAttribute:NSForegroundColorAttributeName value:color range:rangOne];
+    return attrString;
+}
+
++ (NSString *)nullString:(NSString *)string {
+    if (string == nil) {
+        string = @"";
+    }
+    return string;
+}
+
++ (NSString *)getJsonStringWithObj:(id)obj {
+    NSData *infoJSONData = [NSJSONSerialization dataWithJSONObject:obj options:NSJSONWritingPrettyPrinted error:nil];
+    if (infoJSONData == nil || infoJSONData.length == 0)
+    {
+        infoJSONData = [NSData data];
+    }
+    NSString *infoJsonString = [[NSString alloc]initWithData:infoJSONData encoding:NSUTF8StringEncoding];
+    return infoJsonString;
+}
+
++(NSString *)getDb01BadgeValueWithBadge:(NSInteger)badge {
+    if (badge == 0) {
+        return nil;
+    }else{
+        return [NSString stringWithFormat:@"%ld",badge];
+    }
+}
+
++(NSString *)getNavTitleWithIndex:(NSInteger)index {
+    NSString *result = @"";
+    switch (index) {
+        case 0:
+            result = @"首页";
+            break;
+        case 1:
+            result = @"聚现场";
+            break;
+        case 2:
+            result = @"消息";
+            break;
+        case 3:
+            result = @"我的";
+            break;
+            
+        default:
+            break;
+    }
+    __block NSString * title = @"";
+    [[HomeDataManager shareManager]getTabbarData:^(NSArray *array) {
+        if (array != nil && array.count>0)
+        {
+            if (index>=array.count)
+            {
+                title = result;
+            }
+            else
+            {
+                NSDictionary *tempDic = array[index];
+                title = [tempDic getStringValueForKey:@"title"];
+            }
+            
+        }
+    }];
+    result = title;
+    return result;
+}
+
+#pragma mark - 加载框提示
+
++ (void)showHud:(NSString *)title View:(UIView *)view {
+    [CoreUtil hideHUDWithView:view];
+    MBProgressHUD *hud =[MBProgressHUD showHUDAddedTo:view animated:YES];
+    hud.mode = MBProgressHUDModeCustomView;
+    hud.color = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.6];
+    hud.color = [UIColor clearColor];
+    hud.margin = 10;
+    hud.labelColor = [UIColor whiteColor];
+    hud.labelFont = FONT16;
+    hud.dimBackground = NO;
+    
+    UIView *waitingView = [[UIView alloc] initWithFrame:AppFrame(0, 0, 60, 60)];
+    
+    UIImageView *animation = [[UIImageView alloc] initWithFrame:AppFrame(0, 0, 60, 60)];
+    animation.image = [UIImage imageNamed:@"hud_waiting_animation"];
+    [waitingView addSubview:animation];
+    
+    UIImageView *logo = [[UIImageView alloc]initWithFrame:AppFrame(0, 0, 60, 60)];
+    logo.image = [UIImage imageNamed:@"hud_waiting_logo"];
+    [waitingView addSubview:logo];
+    
+    hud.customView = waitingView;
+    
+    /**
+     *  动画显示
+     */
+    CABasicAnimation* rotationAnimation;
+    rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    rotationAnimation.toValue = [NSNumber numberWithFloat: M_PI * 2.0 ];
+    rotationAnimation.duration = 1;
+    rotationAnimation.cumulative = YES;
+    rotationAnimation.repeatCount = HUGE_VALF;
+    [animation.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
+    
+    if ([title length]>0) {
+        hud.labelText = title;
+    }
+    hud.removeFromSuperViewOnHide = YES;
+    [hud show:YES];
+}
+
++ (void)showProgressHUD:(NSString *)title View:(UIView *)view {
+    
+    [CoreUtil hideHUDWithView:view];
+    MBProgressHUD *hud =[[MBProgressHUD alloc] initWithView:view];
+    hud.color = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.6];
+    if ([title length]>0) {
+        hud.labelText = title;
+    }
+    [view addSubview:hud];
+    [hud show:YES];
+    [hud hide:YES afterDelay:1.0];
+}
+
++ (void)showSuccessHUD:(NSString *)title View:(UIView *)view {
+    
+    [CoreUtil hideHUDWithView:view];
+    
+    MBProgressHUD *hud =[MBProgressHUD showHUDAddedTo:view animated:YES];
+    
+    hud.color = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.6];
+    hud.margin = 10;
+    hud.labelColor = [UIColor whiteColor];
+    hud.labelFont = FONT16;
+    
+    hud.mode = MBProgressHUDModeCustomView;
+    hud.customView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"37x-success"]];
+    if ([title length]>0) {
+        hud.labelText = title;
+    }
+    hud.removeFromSuperViewOnHide = YES;
+    [hud hide:YES afterDelay:2];
+}
+
++ (void)showFailedHUD:(NSString *)title  View:(UIView *)view {
+    
+    [CoreUtil hideHUDWithView:view];
+    MBProgressHUD *hud =[MBProgressHUD showHUDAddedTo:view animated:YES];
+    hud.color = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.6];
+    hud.margin = 10;
+    hud.labelColor =[UIColor whiteColor];
+    hud.labelFont = FONT16;
+    
+    hud.mode = MBProgressHUDModeCustomView;
+    hud.customView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"37x-failed"]];
+    if ([title length]>0) {
+        hud.labelText = title;
+    }
+    hud.removeFromSuperViewOnHide = YES;
+    [hud hide:YES afterDelay:2];
+}
+
++ (void)showWarningHUD:(NSString *)title View:(UIView *)view {
+    
+    [CoreUtil hideHUDWithView:view];
+    MBProgressHUD *hud =[MBProgressHUD showHUDAddedTo:view animated:YES];
+    hud.color = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.6];
+    hud.margin = 10;
+    hud.labelColor = [UIColor whiteColor];
+    hud.labelFont = FONT16;
+    
+    hud.mode = MBProgressHUDModeCustomView;
+    hud.customView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"37x-warning"]];
+    if ([title length]>0) {
+        hud.labelText = title;
+    }
+    hud.removeFromSuperViewOnHide = YES;
+    [hud hide:YES afterDelay:2];
+    
+}
+
++ (void)hideHUDWithView:(UIView *)view{
+    [MBProgressHUD hideAllHUDsForView:view animated:YES];
+}
+
++ (void)showText:(NSString *)string View:(UIView *)view {
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
+    hud.mode = MBProgressHUDModeText;
+    hud.labelText = string;
+    hud.margin = 10.f;
+    hud.removeFromSuperViewOnHide = YES;
+    [hud hide:YES afterDelay:2];
+}
+
+#pragma mark - 根据颜色值画图片
+
++ (UIImage *)getImageFromColor:(UIColor *)color
+{
+    CGRect rect = CGRectMake(0, 0, 2, 2);
+    UIGraphicsBeginImageContext(rect.size);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetFillColorWithColor(context, [color CGColor]);
+    CGContextFillRect(context, rect);
+    UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return img;
+}
+
+#pragma mark - 转换时间格式
+
++ (NSString *)getTimeStringByDate:(NSDate *)date Formatter:(NSString *)format{
+    
+    NSDateFormatter *formatter=[[NSDateFormatter alloc]init];
+    [formatter setDateFormat:format];
+//    NSTimeZone *timeZone = [[NSTimeZone alloc] initWithName:@"Asia/Shanghai"];
+    formatter.timeZone = [NSTimeZone defaultTimeZone];
+    NSString *dateTime=[formatter stringFromDate:date];
+    return dateTime;
+}
+
+#pragma mark - 检测设备是否可以语音
+
++ (BOOL)canRecord {
+    
+    __block BOOL bCanRecord = YES;
+    if ([[[UIDevice currentDevice] systemVersion] compare:@"7.0"] != NSOrderedAscending)
+    {
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        if ([audioSession respondsToSelector:@selector(requestRecordPermission:)]) {
+            [audioSession performSelector:@selector(requestRecordPermission:) withObject:^(BOOL granted) {
+                bCanRecord = granted;
+            }];
+        }
+    }
+    return bCanRecord;
+}
+
+#pragma mark - 获取视频第一帧 网络视频 && 本地视频
+
++ (UIImage *)getVideoPreViewImage:(NSString *)urlString{
+    
+    if([urlString isEqualToString:@""] ||urlString == nil){
+        return [UIImage imageNamed:@"cacheImage"];
+    }
+    NSString *tempUrlString = urlString;
+    NSURL *videoPath = [NSURL URLWithString:tempUrlString];
+    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoPath options:nil];
+    AVAssetImageGenerator *gen = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+    gen.appliesPreferredTrackTransform = YES;
+    CMTime time = CMTimeMakeWithSeconds(0.0, 600);
+    NSError *error = nil;
+    CMTime actualTime;
+    CGImageRef image = [gen copyCGImageAtTime:time actualTime:&actualTime error:&error];
+    UIImage *img = [[UIImage alloc] initWithCGImage:image];
+    if(img == nil){
+        return [UIImage imageNamed:@"cacheImage"];
+    }
+    return img;
+    
+}
+
++ (UIImage *)getLoaclVideoPreViewImage:(NSString *)urlString{
+    if([urlString isEqualToString:@""] ||urlString == nil){
+        return [UIImage imageNamed:@"cacheImage"];
+    }
+    NSString *tempUrlString = urlString;
+    NSURL *videoPath = [[NSURL alloc]initFileURLWithPath:tempUrlString];
+    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoPath options:nil];
+    AVAssetImageGenerator *gen = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+    gen.appliesPreferredTrackTransform = YES;
+    CMTime time = CMTimeMakeWithSeconds(0.0, 600);
+    NSError *error = nil;
+    CMTime actualTime;
+    CGImageRef image = [gen copyCGImageAtTime:time actualTime:&actualTime error:&error];
+    UIImage *img = [[UIImage alloc] initWithCGImage:image];
+    if(img == nil){
+        return [UIImage imageNamed:@"cacheImage"];
+    }
+    return img;
+}
+
++ (void)downloadImageWithImageUrl:(NSString *)imageUrl
+{
+    UIImage *tpImage = [[SDImageCache sharedImageCache]imageFromDiskCacheForKey:imageUrl];
+    if (tpImage != nil)
+    {
+        return;
+    }
+    [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:[NSURL URLWithString:imageUrl] options:SDWebImageDownloaderContinueInBackground progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+        nil;
+    } completed:^(UIImage *image, NSData *data, NSError *error, BOOL finished) {
+        /**
+         *  图片下载完成，进行图片存储
+         */
+        if (finished == YES)
+        {
+            [[SDImageCache sharedImageCache] storeImage:image forKey:imageUrl toDisk:YES];
+        }
+    }];
+}
+
+#pragma mark - 网络是否正常
++ (BOOL)isNetwork {
+    if ([CoreUtil isConnectionAvailable] != NetWorkNotReachable ) {
+        return YES;
+    }else{
+        return NO;
+    }
+}
+
++ (NetWorkStatus) isConnectionAvailable {
+    NetWorkStatus status;
+    //    Reachability *reach = [Reachability reachabilityWithHostName:@"www.baidu.com"];
+    Reachability *reach = [Reachability reachabilityForInternetConnection];
+    if ([reach currentReachabilityStatus] == ReachableViaWiFi){
+        status = NetWorkIsWIFI;
+    }else if ([reach currentReachabilityStatus] == ReachableViaWWAN){
+        status = NetWorkIs3G;
+    }else {
+        status = NetWorkNotReachable;
+    }
+    return status;
+}
+
++(void)showTextWithVC:(BaseViewController *)baseSV Error:(NSError *)error {
+    [CoreUtil hideHUDWithView:baseSV.navigationController.view];
+    if (error.code == NSURLErrorTimedOut)
+    {
+        [baseSV showText:@"请求超时"];
+    }
+    else if (error.code == NSURLErrorNetworkConnectionLost)
+    {
+        [baseSV showText:@"网络无法连接"];
+    }
+    else
+    {
+        [baseSV showText:@"登录失败"];
+    }
+}
+
+#pragma mark - 发送本地通知
+
++ (void)sendLocalNotificationWithFireSec:(NSTimeInterval)secs AlertBody:(NSString *)alertBody AlertAction:(NSString *)alertAction {
+    UILocalNotification *localNotification = [[UILocalNotification alloc] init];
+    localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:secs];
+    NSTimeZone *timeZone = [[NSTimeZone alloc] initWithName:@"Asia/Shanghai"];
+    localNotification.timeZone = timeZone;
+    localNotification.alertBody = alertBody;
+    localNotification.alertAction = alertAction;
+    /**
+     *  设置提醒的声音，可以自己添加声音文件，这里设置为默认提示声
+     */
+    localNotification.soundName = UILocalNotificationDefaultSoundName;
+    /**
+     *  设置通知的相关信息，这个很重要，可以添加一些标记性内容，方便以后区分和获取通知的信息
+     */
+    NSDictionary *infoDic = @{@"msgId":@"1231",
+                              @"content":alertBody};
+    localNotification.userInfo = infoDic;
+    [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+}
+
+#pragma mark - 获取用户基本信息字典
+
++ (NSDictionary *)getUserInformation {
+    NSMutableDictionary *tempDic = [NSMutableDictionary dictionary];
+    if ([MDUserManager shareManager].currentUser.userState == isOnLine)
+    {
+        NSString *userNickName = [MDUserManager shareManager].currentUser.nickName;
+        NSString *userHeadUrl= [MDUserManager shareManager].currentUser.headURL;
+        NSString *userId = [NSString stringWithFormat:@"%ld",[MDUserManager shareManager].currentUser.userId];
+        NSString *userPoint= [MDUserManager shareManager].currentUser.userScore;
+        [tempDic setObject:userNickName forKey:@"userNick"];
+        [tempDic setObject:userHeadUrl forKey:@"avater"];
+        [tempDic setObject:userId forKey:@"userId"];
+        [tempDic setObject:userPoint forKey:@"userPoint"];
+    }
+    return tempDic;
+}
+
+@end

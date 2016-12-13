@@ -1,0 +1,363 @@
+//
+//  CoreUtil.h
+//  FashionMovie
+//
+//  Created by 吴 吴 on 15/8/26.
+//  Copyright (c) 2015年 蔡成汉. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import "Reachability.h"
+#import "BaseViewController.h"
+
+typedef enum {
+    NetWorkNotReachable,
+    NetWorkIsWIFI,
+    NetWorkIs3G,
+} NetWorkStatus;
+
+@interface CoreUtil : NSObject
+
+#pragma mark - 视图模块
+
+/**
+ *  创建导航NavigationItem.titleView
+ *
+ *  @param title 标题
+ *  @param color 字体颜色
+ *  @param font  字体大小数值
+ *
+ *  @return UIView
+ */
++ (UIView *)createTitleViewWithString:(NSString *)title AndTitleColor:(UIColor *)color Font:(float)font;
+
+/**
+ *  系统日历触发的和日历连在一起的view
+ *
+ *  @param picker         UIDatePicker
+ *  @param okSelector     确定按钮事件
+ *  @param cancelSelector 取消按钮事件
+ *  @param target         当前对象
+ *
+ *  @return UIView
+ */
++ (UIView *)setInputViewWithDatePicker:(UIDatePicker *)picker RightAction:(SEL)okSelector LeftAction:(SEL)cancelSelector Target:(id)target;
+
+
+/**
+ *  系统UIPickerView触发的和UIPickerView连在一起的view
+ *
+ *  @param picker         UIPickerView
+ *  @param okSelector     确定按钮事件
+ *  @param cancelSelector 取消按钮事件
+ *  @param target         当前对象
+ *
+ *  @return UIView
+ */
++ (UIView *)setInputViewWithPicker:(UIPickerView *)picker RightAction:(SEL)okSelector LeftAction:(SEL)cancelSelector Target:(id)target;
+
+
+/**
+ *  创建导航返回按钮(带标题)
+ *
+ *  @param title    返回按钮标题
+ *  @param target   当前对象
+ *  @param selector 返回按钮事件
+ *
+ *  @return UIBarButtonItem
+ */
++ (UIBarButtonItem *)createNavigationBarBackItemWithTitle:(NSString *)title Target:(id)target Selector:(SEL)selector;
+
+/**
+ *  创建导航返回按钮(无标题)
+ *
+ *  @param target   当前对象
+ *  @param selector 返回按钮事件
+ *
+ *  @return UIBarButtonItem
+ */
++ (UIBarButtonItem *)creatNavigationBarBackItemWithTarget:(id)target Action:(SEL)selector;
+
+/**
+ *  创建导航按钮
+ *
+ *  @param target 目标对象
+ *  @param action 动作
+ *  @param icon   icon
+ *  @param isLeft 是否为左边，默认为NO
+ *
+ *  @return UIBarButtonItem
+ */
++(UIBarButtonItem *)createnavigationBarButtonItemWithTarget:(id)target action:(SEL)action icon:(UIImage *)icon isLeft:(BOOL)isLeft;
+
+/**
+ *  创建导航按钮
+ *
+ *  @param target 目标对象
+ *  @param action 动作
+ *  @param icon   icon
+ *  @param isLeft 是否为左边，默认为NO
+ *  @param size   尺寸
+ *
+ *  @return UIBarButtonItem
+ */
++(UIBarButtonItem *)createnavigationBarButtonItemWithTarget:(id)target action:(SEL)action icon:(UIImage *)icon isLeft:(BOOL)isLeft size:(CGSize)size;
+
+/**
+ *  创建导航取消按钮
+ *
+ *  @param target 当前对象
+ *  @param isLeft NO,在右边
+ *
+ *  @return UIBarButtonItem
+ */
++ (UIBarButtonItem *)creatNavigationCancelItemWithTarget:(id)target Selector:(SEL)selector IsLeft:(BOOL)isLeft;
+
+
+/**
+ *  创建导航分享按钮
+ *
+ *  @param target 当前对象
+ *  @param Selector 按钮事件
+ *
+ *  @return UIBarButtonItem
+ */
++ (UIBarButtonItem *)creatNavigationShareItemWithTarget:(id)target Selector:(SEL)selector;
+
+
+/**
+ *  返回导航快的按钮
+ *
+ *  @param target   当前对象
+ *  @param iconSize 图标大小
+ *  @param icon     图片
+ *  @param selector 按钮事件
+ *
+ *  @return UIBarButtonItem
+ */
++ (UIBarButtonItem *)creatNavigationItemWithTarget:(id)target IconSize:(CGSize)iconSize Icon:(UIImage *)icon Selector:(SEL)selector IsLeft:(BOOL)isLeft;
+
+/**
+ *  创建导航搜索按钮
+ *
+ *  @param target 当前对象
+ *  @param Selector 按钮事件
+ *
+ *  @return UIBarButtonItem
+ */
++ (UIBarButtonItem *)creatNavigationSearchItemWithTarget:(id)target Selector:(SEL)selector;
+
+
+/**
+ *  创建一个只带标题的UIBarButtonItem
+ *
+ *  @param title    标题
+ *  @param target   当前对象
+ *  @param selector 按钮事件
+ *
+ *  @return UIBarButtonItem
+ */
++ (UIBarButtonItem *)createBarButtonItemWithTitle:(NSString *)title Target:(id)target Selector:(SEL)selector;
+
+
+/**
+ *  创建一个只带标题的UIBarButtonItem
+ *
+ *  @param title          标题
+ *  @param selector       按钮事件
+ *  @param target         当前对象
+ *
+ *  @return 只带标题的导航item
+ */
++ (UIBarButtonItem *)creatNavigationBarWithTitle:(NSString *)title Target:(id)target Action:(SEL)selector IsLeft:(BOOL)isLeft;
+
+
+/**
+ *  创建自定义键盘toolBar
+ *
+ *  @param target         当前对象
+ *  @param okSelector     确定按钮事件
+ *  @param cancelSelector 取消按钮事件
+ *
+ *  @return UIToolbar
+ */
++ (UIToolbar *)createToolBar:(id)target RightAction:(SEL)okSelector LeftAction:(SEL)cancelSelector;
+
+
+/**
+ *  创建背景图片视图
+ *
+ *  @param imageUrl 图片链接或者图片名字
+ *  @param frame    UIImageView坐标
+ *
+ *  @return UIImageView
+ */
++ (UIImageView *)createBackGroundImageView:(NSString *)imageUrl Frame:(CGRect)frame;
+
+/**
+ *  创建菊花
+ *
+ *  @return UIActivityIndicatorView
+ */
++ (UIActivityIndicatorView *)creatActivityIndicatorView;
+
+
+/**
+ *  创建无数据时的显示视图
+ *
+ *  @param frame UIView的坐标
+ *  @param target 当前对象
+ *  @param selector 事件
+ *  @param text 文字介绍
+ *  @return UIView
+ */
++ (UIView *)creatNoDataViewWithFrame:(CGRect)frame Target:(id)target Selector:(SEL)selector Text:(NSString *)text;
+
+#pragma mark - 字符串模块
+
+/**
+ *  获取字符串宽度
+ *
+ *  @param string 目标字符串
+ *  @param font   字体大小
+ *
+ *  @return float
+ */
++ (float)getStringWidth:(NSString *)string AndFont:(float)font;
+
+
+/**
+ *  返回不为nil的字符串
+ *
+ *  @param string 目标字符串
+ *
+ *  @return NSString
+ */
++ (NSString *)nullString:(NSString *)string;
+
+
+/**
+ *  对目标字符串中的关键字进行大小或者字体颜色进行处理
+ *
+ *  @param source      目标字符串
+ *  @param keyWordsOne 关键词
+ *  @param font        字体大小
+ *  @param color       字体颜色
+ *
+ *  @return NSAttributedString
+ */
++ (NSAttributedString *)getFormatStringWithSourceString:(NSString *)source KeyWordsOne:(NSString *)keyWordsOne Font:(UIFont *)font Color:(UIColor*)color;
+
+
+/**
+ *  将目标数据转化为Json字符串
+ *
+ *  @param obj 目标数据
+ *
+ *  @return NSString
+ */
++ (NSString *)getJsonStringWithObj:(id)obj;
+
+/**
+ *  获取消息tab显示的边角数
+ *
+ *  @param badge 当前应用程序角标数
+ *
+ *  @return db01显示的边角数
+ */
++(NSString *)getDb01BadgeValueWithBadge:(NSInteger)badge;
+
+
+/**
+ *  根据tabbar界面索引，获取tabbar界面导航标题
+ *
+ *  @param index tabbar界面索引
+ *
+ *  @return tabbar界面导航标题
+ */
++(NSString *)getNavTitleWithIndex:(NSInteger)index;
+
+#pragma mark - 加载框提示
+
++ (void)showHud:(NSString *)title View:(UIView *)view;
++ (void)showProgressHUD:(NSString *)title View:(UIView *)view;
++ (void)showSuccessHUD:(NSString *)title View:(UIView *)view;
++ (void)showFailedHUD:(NSString *)title  View:(UIView *)view;
++ (void)showWarningHUD:(NSString *)title View:(UIView *)view;
++ (void)hideHUDWithView:(UIView *)view;
++ (void)showText:(NSString *)string View:(UIView *)view;
+
+#pragma mark - 根据颜色值画图片
+
++ (UIImage *)getImageFromColor:(UIColor *)color;
+
+#pragma mark - 转换时间格式
+
++ (NSString *)getTimeStringByDate:(NSDate *)date Formatter:(NSString *)format;
+
+#pragma mark - 检测设备是否可以语音
+
++ (BOOL)canRecord;
+
+#pragma mark - 获取视频第一帧 网络视频 && 本地视频
+
+/**
+ *  获取网络视频第一帧图片
+ *
+ *  @param urlString 网络视频url
+ *
+ *  @return 网络视频第一帧
+ */
++ (UIImage*)getVideoPreViewImage:(NSString *)urlString;
+
+/**
+ *  获取本地视频第一帧图片
+ *
+ *  @param urlString 本地视频url
+ *
+ *  @return 本地视频第一帧
+ */
++ (UIImage *)getLoaclVideoPreViewImage:(NSString *)urlString;
+
+/**
+ *  根据图片链接，下载图片
+ *
+ *  @param imageUrl 图片链接
+ */
++ (void)downloadImageWithImageUrl:(NSString *)imageUrl;
+
+#pragma mark - 网络判断和提示模块
+/**
+ *  网络连接是否正常
+ *
+ *  @return NO不正常
+ */
++ (BOOL)isNetwork;
+
+/**
+ *  网络请求失败提示
+ *
+ *  @param baseSV 发起请求的界面
+ *  @param error  NSError
+ */
++(void)showTextWithVC:(BaseViewController *)baseSV Error:(NSError *)error;
+
+
+#pragma mark - 发送本地通知
+
+/**
+ *  发送本地通知
+ *
+ *  @param secs        距离发送的时间,单位为秒
+ *  @param alertBody   通知的内容
+ *  @param alertAction 通知动作按钮的标题
+ */
++ (void)sendLocalNotificationWithFireSec:(NSTimeInterval)secs AlertBody:(NSString *)alertBody AlertAction:(NSString *)alertAction;
+
+
+#pragma mark - 获取用户基本信息字典
+
++ (NSDictionary *)getUserInformation;
+
+
+@end

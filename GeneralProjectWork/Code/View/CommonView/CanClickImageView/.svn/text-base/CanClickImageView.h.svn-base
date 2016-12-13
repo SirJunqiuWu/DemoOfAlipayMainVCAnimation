@@ -1,0 +1,33 @@
+//
+//  CanClickImageView.h
+//  MovieDate
+//
+//  Created by 吴 吴 on 16/2/25.
+//  Copyright © 2016年 上海佳黛品牌策划有限公司. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+@interface CanClickImageView : UIImageView
+
+/**
+ *  点击的协议
+ */
+@property(nonatomic,strong)NSString *clickUrl;
+/**
+ *  显示的图片链接
+ */
+@property(nonatomic,strong)NSString *imageUrl;
+
+/**
+ *  当前点击的文章id
+ */
+@property(nonatomic,strong)NSString *articleId;
+
+
+/**
+ *  当前点击的卡通类别id
+ */
+@property(nonatomic,strong)NSString *movie_level2_id;
+
+@end

@@ -1,0 +1,37 @@
+//
+//  PrefixHeader.pch
+//  GeneralProjectWork
+//
+//  Created by 吴 吴 on 16/3/21.
+//  Copyright © 2016年 JackWu. All rights reserved.
+//
+
+#import <Availability.h>
+
+#ifndef __IPHONE_5_0
+#warning "This project uses features only available in iOS SDK 7.0 and later."
+#endif
+
+#ifdef __OBJC__
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+#import "ConnectManager.h"
+#import "Constants.h"
+#import "AppConfig.h"
+#import "URLConfig.h"
+#import "FMDBConfig.h"
+#import "ControllerConfig.h"
+#import "SizeFontColorConfig.h"
+#import "GeneralProjectWorkDefs.h"
+#import "CoreUtil.h"
+#import "UIViewExt.h"
+#import <Addition/AdditionFrameworks.h>
+#import "AppDelegate.h"
+#import "VCManager.h"
+#import "BaseViewController.h"
+#import <SDVersion/SDVersion.h>
+#import <MJRefresh/MJRefresh.h>
+#import <EGOCache/EGOCache.h>
+#import <SDWebImage/UIImageView+WebCache.h>
+#endif
+
