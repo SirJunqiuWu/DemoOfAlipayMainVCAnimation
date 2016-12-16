@@ -8,10 +8,20 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol FiexdViewDelegate;
 
 /**
  中间固定不动的部分
  */
 @interface FiexdView : UIView
+
+@property(nonatomic,assign)id<FiexdViewDelegate>delegate;
+@end
+
+@protocol FiexdViewDelegate <NSObject>
+
+@optional
+
+- (void)fixedViewBtnPressedWithBtnTitle:(NSString *)btnTitle;
 
 @end

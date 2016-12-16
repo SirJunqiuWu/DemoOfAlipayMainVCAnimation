@@ -17,7 +17,7 @@ const float ChangeHeight = 86.0;
 const float FixedHeight  = 145.0;
 //列表内容内嵌部分
 const float ContentInsetHeight = ChangeHeight+FixedHeight;
-@interface DA01Controller ()<UITableViewDataSource,UITableViewDelegate>
+@interface DA01Controller ()<UITableViewDataSource,UITableViewDelegate,FiexdViewDelegate>
 {
     
     //导航部分视图
@@ -30,7 +30,8 @@ const float ContentInsetHeight = ChangeHeight+FixedHeight;
     UITableView            *infoTable;
     NSMutableArray         *dataArray;
 }
-
+@property (nonatomic,assign)CGPoint beginPoint;
+@property (nonatomic,assign)CGPoint movePoint;
 
 @end
 
@@ -45,7 +46,6 @@ const float ContentInsetHeight = ChangeHeight+FixedHeight;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor colorWithHexString:@"#efefef"];
     self.automaticallyAdjustsScrollViewInsets = NO;
     [self setupUI];
     [self uploadDataReq];
@@ -65,33 +65,44 @@ const float ContentInsetHeight = ChangeHeight+FixedHeight;
 - (void)setupUI {
     //通过对列表内容内嵌，达到支付宝首界面动画效果
     infoTable = [[UITableView alloc]initWithFrame:AppFrame(0,64,AppScreenWidth, AppScreenHeight-49-64) style:UITableViewStylePlain];
+    infoTable.backgroundColor = [UIColor clearColor];
+    infoTable.contentInset = UIEdgeInsetsMake(ContentInsetHeight, 0, 0, 0);
+    infoTable.scrollIndicatorInsets = UIEdgeInsetsMake(ContentInsetHeight, 0, 0, 0);
     infoTable.dataSource = self;
     infoTable.delegate = self;
-    infoTable.contentInset = UIEdgeInsetsMake(ChangeHeight+FixedHeight, 0, 0, 0);
-    infoTable.scrollIndicatorInsets = UIEdgeInsetsMake(ChangeHeight+FixedHeight, 0, 0, 0);
-    infoTable.tableHeaderView = nil;
     [self.view addSubview:infoTable];
+    
     infoTable.mj_header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(refreshData)];
     
     fiexdView = [[FiexdView alloc]initWithFrame:AppFrame(0,64+ChangeHeight,AppScreenWidth,FixedHeight)];
     fiexdView.backgroundColor = [UIColor whiteColor];
+    //  YES表示可接收事件、NO表示不可接收事件，则被下一层接收
+    fiexdView.userInteractionEnabled = NO;
+    fiexdView.delegate = self;
     [fiexdView drawBottomLine];
     [self.view addSubview:fiexdView];
     
     navView   = [[NavView alloc]initWithFrame:AppFrame(0, 0, AppScreenWidth, 64)];
     navView.backgroundColor = [UIColor blueColor];
+    navView.userInteractionEnabled = NO;
     [self.view addSubview:navView];
-    
     
     changeView= [[MyInfoSectionView alloc]initWithFrame:AppFrame(0,navView.bottom,AppScreenWidth,ChangeHeight)];
     changeView.backgroundColor = [UIColor colorWithHexString:@"#676A74"];
+    changeView.userInteractionEnabled = NO;
     [self.view addSubview:changeView];
-
+    
     [infoTable addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:nil];
 }
 
 - (void)refreshData {
     [infoTable.mj_header endRefreshing];
+}
+
+#pragma mark - FiexdViewDelegate
+
+- (void)fixedViewBtnPressedWithBtnTitle:(NSString *)btnTitle {
+    NSLog(@"当前点击的按钮标题:%@",btnTitle);
 }
 
 #pragma mark - KVO 监控列表滑动高度，并调整视图位置
@@ -106,7 +117,7 @@ const float ContentInsetHeight = ChangeHeight+FixedHeight;
     //读取change中改变后的point值
     id latestValue = [change valueForKey:NSKeyValueChangeNewKey];
     [ (NSValue*)latestValue getValue:&latestPoint];
-
+    
     //上下滑动的位置
     float changeY = latestPoint.y+ContentInsetHeight;
     if (changeY<0)
@@ -114,7 +125,7 @@ const float ContentInsetHeight = ChangeHeight+FixedHeight;
         //下拉禁止动态部分变化
         changeY = 0;
     }
-     [self resetUIWithChangeHeight:changeY];
+    [self resetUIWithChangeHeight:changeY];
 }
 
 - (void)resetUIWithChangeHeight:(float)changeHeight {
